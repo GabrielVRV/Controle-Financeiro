@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import './index.css';
 
 function Filtros({ onLogout }) {
     const [transacoes, setTransacoes] = useState([]);
@@ -64,7 +65,10 @@ function Filtros({ onLogout }) {
             const params = new URLSearchParams();
             if (mes) params.append('mes', mes);
             if (ano) params.append('ano', ano);
-            if (categoriaId) params.append('categoria_id', categoriaId);
+            // CORREÇÃO: Adiciona o parâmetro de categoria APENAS se um valor válido for selecionado.
+            if (categoriaId) {
+                params.append('categoria_id', categoriaId);
+            }
             if (desc) params.append('descricao', desc);
             const queryString = params.toString();
 

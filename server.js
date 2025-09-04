@@ -160,11 +160,12 @@ app.post('/transacoes', autenticarToken, async (req, res) => {
     }
 });
 
-// Rota para listar transações (agora com JOIN para obter o nome da categoria)
+// Rota para listar transações (agora com JOIN para obter o nome da categoria E FILTRO)
 app.get('/transacoes', autenticarToken, async (req, res) => {
     try {
         const usuarioId = req.usuario.id;
-        const { mes, ano, descricao } = req.query;
+        // CORREÇÃO: Adicionando 'categoria_id' aos parâmetros de busca
+        const { mes, ano, descricao, categoria_id } = req.query;
 
         let query = `
             SELECT t.*, c.nome AS categoria
@@ -185,6 +186,13 @@ app.get('/transacoes', autenticarToken, async (req, res) => {
             const anos = ano.split(',');
             query += ` AND EXTRACT(YEAR FROM t.data) IN (${anos.map((_, i) => `$${paramIndex++}`).join(', ')})`;
             params.push(...anos.map(a => parseInt(a)));
+        }
+        
+        // CORREÇÃO: Adicionando a condição para o filtro de categoria
+        if (categoria_id) {
+            query += ` AND t.categoria_id = $${paramIndex}`;
+            params.push(categoria_id);
+            paramIndex++;
         }
 
         if (descricao) {
@@ -261,11 +269,12 @@ app.delete('/transacoes/:id', autenticarToken, async (req, res) => {
     }
 });
 
-// Rota para calcular balanço (com JOIN para obter o nome da categoria)
+// Rota para calcular balanço (com JOIN para obter o nome da categoria e FILTRO)
 app.get('/balanco', autenticarToken, async (req, res) => {
     try {
         const usuarioId = req.usuario.id;
-        const { mes, ano, descricao } = req.query;
+        // CORREÇÃO: Adicionando 'categoria_id' aos parâmetros de busca
+        const { mes, ano, descricao, categoria_id } = req.query;
 
         let params = [usuarioId];
         let paramIndex = 2;
@@ -288,6 +297,13 @@ app.get('/balanco', autenticarToken, async (req, res) => {
             const anos = ano.split(',');
             query += ` AND EXTRACT(YEAR FROM t.data) IN (${anos.map((_, i) => `$${paramIndex++}`).join(', ')})`;
             params.push(...anos.map(a => parseInt(a)));
+        }
+        
+        // CORREÇÃO: Adicionando a condição para o filtro de categoria
+        if (categoria_id) {
+            query += ` AND t.categoria_id = $${paramIndex}`;
+            params.push(categoria_id);
+            paramIndex++;
         }
         
         if (descricao) {
