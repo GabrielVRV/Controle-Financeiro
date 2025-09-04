@@ -33,6 +33,10 @@ function Dashboard({ onLogout }) {
         7: 'Julho', 8: 'Agosto', 9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
     };
 
+    /**
+     * Processa os dados das transações para gerar o gráfico de balanço mensal.
+     * @param {Array} transacoes - A lista de transações.
+     */
     const processBalancoMensalData = (transacoes) => {
         const dataPorMes = transacoes.reduce((acc, transacao) => {
             const data = new Date(transacao.data);
@@ -45,9 +49,9 @@ function Dashboard({ onLogout }) {
             }
 
             if (transacao.tipo === 'receita') {
-                acc[chave].receitas += transacao.valor;
+                acc[chave].receitas += parseFloat(transacao.valor);
             } else if (transacao.tipo === 'despesa') {
-                acc[chave].despesas += transacao.valor;
+                acc[chave].despesas += parseFloat(transacao.valor);
             }
 
             return acc;
@@ -61,11 +65,15 @@ function Dashboard({ onLogout }) {
         setBalancoMensalData(dataArray);
     };
 
+    /**
+     * Processa os dados das transações para gerar o total de despesas por categoria.
+     * @param {Array} transacoes - A lista de transações.
+     */
     const processDespesasPorCategoria = (transacoes) => {
         const despesas = transacoes.filter(t => t.tipo === 'despesa');
         const categoriaTotais = despesas.reduce((acc, transacao) => {
             const categoriaNome = transacao.categoria || 'Não Categorizado';
-            acc[categoriaNome] = (acc[categoriaNome] || 0) + transacao.valor;
+            acc[categoriaNome] = (acc[categoriaNome] || 0) + parseFloat(transacao.valor);
             return acc;
         }, {});
 
